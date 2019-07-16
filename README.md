@@ -1,0 +1,3 @@
+# VideoJs Player
+This project includes some improvement to VideoJs Player. This concerns the delay and adaptation to the mobile device. Version 1 includes Ads support. The user can specify to include ads at a specific moment.
+This concerns playing ads without DFP Server. it's just some ads sequence played by the player. it's not like vast, vpaid ads...

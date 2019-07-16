@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <title>Video Test</title>
+  <link href="https://vjs.zencdn.net/7.4.1/video-js.css" rel="stylesheet">
+
+</head>
+<body>
+  <h2>Custom Player</h2>
+<video id="my-video" class="video-js" controls preload="auto" width="640" height="264" data-setup="{}" autoplay muted></video>
+
+<p>
+insert ads at: <input type="number" id="adtime"/>  
+<input type="button" name="insert" value="set Ad Time" onclick="setAdTime()">
+</p>
+<script src="czenjscp.js"></script>
+<!-- adding contrib hls/dash videojs -->  
+<script type="text/javascript" src="https://unpkg.com/@videojs/http-streaming@1.10.2/dist/videojs-http-streaming.min.js"></script>
+  <script type="text/javascript">  
+        // this is for supporting the mobile devices
+        videojs.options.hls.overrideNative = true;
+        videojs.options.html5.nativeAudioTracks = false;
+        videojs.options.html5.nativeTextTracks = false;
+        // player setup
+        var player = videojs('my-video', {liveui: true});
+        // adTime will contain the specified time when the ad will be played
+        var adTime;
+        // stopAt variable will contain where the video is left
+        var stopAt;
+        // videoSrc is the video source
+        var videoSrc = "http://192.168.43.144:9000/video/playlist.m3u8";
+        // adSrc is the ad video source
+        var adSrc = "http://192.168.43.144:9000/ad/playlist.m3u8";
+        // adIsPlaying is true when the ad is being played
+        var adIsPlaying=false;
+        // adIsPlayed is true when the ad is already played. we are done playing the ad
+        var adIsPlayed = false;
+        // videoRest is true when we're getting back to our orginal video
+        var videoReset = false;
+        // setting the video Source
+        player.src({
+        src: videoSrc,
+        type: 'application/x-mpegURL'
+        });    
+        // setting the adTime by the user
+        function setAdTime(){          
+          adTime = document.getElementById("adtime").value;
+          console.log("add will start at "+adTime);
+        }
+        
+        player.on('timeupdate', function() {
+          // this condition is true when the video that is currently being playing is finished
+          if(player.currentTime() >= Math.floor(player.duration())){          
+          // check if the video played is an ad video
+          if(adIsPlaying){
+            // we set adIsplaying back to false and adisplayed to true
+            adIsPlaying = false;
+            adIsPlayed = true;
+            // pause the video and load the original source video
+            player.pause();
+            player.src(videoSrc);  
+            player.load();          
+          }
+          }
+          // if we have a new adTime
+          if(adTime){
+            // if ad is not playing and the we reached the adTime we need to play the ad now
+            if(!adIsPlaying && !adIsPlayed && player.currentTime() >= adTime){
+              // store the specific time where we left on the video
+              stopAt = player.currentTime();
+              // console.log("Playing the ad..........");
+              // pause the player and load the ad video source
+              player.pause();
+              player.src(adSrc);
+              player.load();
+              // set the duration of the video to a new duration 
+              /* I added one second so when the ad is done we have an extra second 
+                 instead of the player finishes then it stops then it goes to the finish state
+              */
+              player.duration(player.duration()+1);
+              // we play the ad              
+              player.play();
+              // we set adIsPlaying to true
+              adIsPlaying = true;
+            }
+          }
+          /* if we have a stopAt duration
+             and the is not playing so we are done playing the ad
+             and we didn't reset the video yet
+             then we can rest the video
+          */
+          if(stopAt && !adIsPlaying && !videoReset){
+            // console.log("setTime to "+stopAt);
+            // set videoReset to true
+            videoReset = true;
+            // and reset the player to where we left before
+            player.currentTime(stopAt);
+            player.play();
+          }
+        });    
+  </script>
+</body>
+</html>

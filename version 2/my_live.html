@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block head_extra %}
+
+    <link href="/static/custom_vjs/video-js.css" rel="stylesheet" type="text/css">
+    <!-- <script src="/static/custom_vjs/czenjs.js"></script> -->
+    <script type="text/javascript" src="/static/custom_vjs/czenjscp.js"></script>
+<!-- adding contrib hls/dash videojs -->
+<script type="text/javascript" src="https://unpkg.com/@videojs/http-streaming@1.10.2/dist/videojs-http-streaming.min.js"></script>
+    <script src="/static/js/levis.js"></script>
+
+{% endblock head_extra %}
+
+{% block content %}
+
+    <br/>
+    <div class="alert alert-info fade show" role="alert">
+        <i class="fa fa-video-camera"></i>
+        <strong>{{ title }}</strong>
+    </div>    
+    <div class="row p-3">
+        <video id="videojs_player" class="video-js vjs-default-skin vjs-4-3 vjs-big-play-centered" controls="controls" preload="auto" poster="" data-setup='{}' width="100%" autoplay>
+            <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
+        </video>    
+    </div>
+
+    <script type="text/javascript">
+
+        //START VIDEO PLAYER RELATED FUNCTIONS
+        // Adapting the player to the mobile so it can play the livestreaming
+        // we need to enable options overrideNative so that the player can live stream on the mobile device
+        // this makes videojs handle the streaming and enables the CEA-608 captions support
+        videojs.options.hls.overrideNative = true;
+        videojs.options.html5.nativeAudioTracks = false;
+        videojs.options.html5.nativeTextTracks = false;
+
+        // var player = videojs('videojs_player', {liveui: true}); 
+        
+        var player =videojs('videojs_player');
+        
+        player.src({
+            src: '{{ src_player }}',
+            type: 'application/x-mpegURL'
+        });
+        // detecting and correcting the player's delay
+        player.on('timeupdate', function() {
+        // player.hls.playlists.media_.segments.length - 4
+        var curretSegment = Math.floor(player.currentTime());
+        var delayc = (player.tech().hls.playlists.media_.segments.length - 1) - curretSegment;
+        // console.log("delay: "+delayc);
+        if(!player.seeking() && delayc > 5 )
+        player.currentTime(player.tech().hls.playlists.media_.segments.length - 4);
+        // console.log(plaer);
+        });
+
+        $(function () {
+            $(window).on('shown.bs.modal', function() {
+            });
+
+            $(window).on('hidden.bs.modal', function() { 
+            });
+
+            window.onload = function () {
+            };
+        });
+    </script>
+
+
+{% endblock content %}

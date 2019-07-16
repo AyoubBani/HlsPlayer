@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+	<title>Video Test</title>
+  <link href="https://vjs.zencdn.net/7.4.1/video-js.css" rel="stylesheet">
+
+</head>
+<body>
+  <h2>Custom Player</h2>
+<video id="my-video" class="video-js" controls preload="auto" width="640" height="264" data-setup="{}" autoplay muted></video>
+
+<h2>VideoJS Player</h2>
+<video id="myx-video" class="video-js" controls preload="auto" width="640" height="264" data-setup="{}" autoplay muted></video>
+  <script src="czenjs.js"></script>
+  <script type="text/javascript">
+  // https://bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8
+  var player = videojs('my-video', {liveui: true});
+  player.src({
+    src: 'http://195.148.125.89:8070/streams/1S4Y2R/playlist.m3u8',
+  type: 'application/x-mpegURL'
+  });    
+
+// player.play();
+
+  </script>
+<script src="vvjs.js"></script>
+  <script type="text/javascript">
+  	var playerx = videojs('myx-video');    
+    playerx.src({
+      src: 'http://195.148.125.89:8070/streams/1S4Y2R/playlist.m3u8',
+    type: 'application/x-mpegURL'
+  });
+  </script>
+
+</body>
+</html>
